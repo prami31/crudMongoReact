@@ -1,0 +1,38 @@
+version: '3.0'
+
+services:
+  reverse-proxy:
+    image: nginx:1.17.10
+    container_name: reverse_proxy
+    depends_on:
+        - mongo
+        - backend
+        - reactapp
+    volumes:
+        - ./reverse_proxy/nginx.conf:/etc/nginx/nginx.conf
+    ports:
+      - 80:80
+  mongo:
+    image: mongo
+    restart: always
+    ports:
+    - 27017:27017
+  backend:
+    container_name: backend
+    build: ./MongoDB-CRUD-with-.Net-Core/MongoDB_CRUD
+    restart: always
+    depends_on: [ mongo ]
+    ports:
+      - 5000:80
+    links:
+      - mongo
+
+  reactapp:
+    container_name: reactapp
+    build: ./MascotasFront
+    ports:
+      - 3000:3000
+    restart: always
+    links:
+      - backend
+
